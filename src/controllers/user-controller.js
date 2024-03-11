@@ -44,4 +44,36 @@ async function getUser(req, res) {
   }
 }
 
-module.exports = { createUser, getUser };
+async function signIn(req, res) {
+  try {
+    console.log("INSIDE SIGNIN");
+    const { user, status } = await userService.signIn({
+      email: req.body.email,
+      password: req.body.password,
+    });
+    if (status) {
+      return res.json({
+        success: true,
+        message: "Successfully signed in",
+        data: user,
+        error: {},
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: "Wrong password",
+        data: user,
+        error: {},
+      });
+    }
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: "Internal server error",
+      data: {},
+      error: error,
+    });
+  }
+}
+
+module.exports = { createUser, getUser, signIn };
