@@ -1,6 +1,7 @@
 const { userRepository } = require("../repositories");
 const bcrypt = require("bcryptjs");
 const UserRepository = new userRepository();
+const jwt = require("jsonwebtoken");
 async function signUp(data) {
   const email = data.email;
 
@@ -34,11 +35,9 @@ async function signIn(data) {
    */
 
   try {
-    console.log("Inside services sign in");
     const email = data.email;
     const currentPassword = data.password;
     const user = await UserRepository.findByEmail({ email: email });
-    console.log(user);
     if (!user) {
       throw {
         message: "No user found with this Email",
@@ -46,18 +45,45 @@ async function signIn(data) {
     }
 
     const status = await bcrypt.compare(currentPassword, user.password);
+    
     // TODO:
     // Sign a JWT token here and return with this function
 
+    function generateJWT(user) {
+      return jwt.sign(
+        {
+          id: user._id,
+          email: user.email,
+        },
+        "cobra_secret",
+        {
+          expiresIn: "2h",
+        }
+      );
+    }
+
     if (status) {
+      const token = generateJWT(user);
+      console.log(token);
       return {
         status,
         user,
+        token,
       };
     } else {
+      return {
+        status: false,
+        user: null,
+        token: null,
+      };
     }
   } catch (error) {
-    throw error;
+    return {
+      success: false,
+      message: "Wrong Password",
+      data: {},
+      error: error,
+    };
   }
 }
 

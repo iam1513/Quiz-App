@@ -46,8 +46,7 @@ async function getUser(req, res) {
 
 async function signIn(req, res) {
   try {
-    console.log("INSIDE SIGNIN");
-    const { user, status } = await userService.signIn({
+    const { user, status, token } = await userService.signIn({
       email: req.body.email,
       password: req.body.password,
     });
@@ -55,18 +54,21 @@ async function signIn(req, res) {
       return res.json({
         success: true,
         message: "Successfully signed in",
-        data: user,
+        data: { email: req.body.email, token },
         error: {},
       });
     } else {
       return res.json({
         success: false,
         message: "Wrong password",
-        data: user,
+        data: { email: req.body.email },
         error: {},
       });
     }
   } catch (error) {
+    console.log(
+      "==============================================================================="
+    );
     return res.json({
       success: false,
       message: "Internal server error",
