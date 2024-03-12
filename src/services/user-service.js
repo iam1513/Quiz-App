@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const UserRepository = new userRepository();
 const jwt = require("jsonwebtoken");
 async function signUp(data) {
+
   const email = data.email;
 
   const emailExists = await UserRepository.findByEmail({ email: email });
@@ -45,7 +46,7 @@ async function signIn(data) {
     }
 
     const status = await bcrypt.compare(currentPassword, user.password);
-    
+
     // TODO:
     // Sign a JWT token here and return with this function
 

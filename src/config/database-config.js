@@ -1,9 +1,12 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+const DB = process.env.DB;
 
 const connect = async () => {
-  await mongoose.connect(
-    "mongodb+srv://iam1513:atlas1513@cluster0.gvgdwxl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-  );
+  await mongoose.connect(DB);
 };
 
 module.exports = { connect };
