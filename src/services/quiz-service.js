@@ -37,4 +37,21 @@ async function deleteQuiz(id) {
   }
 }
 
-module.exports = { createQuiz, getQuiz, updateQuiz, deleteQuiz };
+async function publishQuiz(data) {
+  try {
+    const quizId = data.quizId;
+    const quiz = await QuizRepository.publish(quizId);
+
+    if (!quiz) {
+      throw new Error("NO QUIZ FOUND");
+    }
+
+    quiz.is_published = true;
+
+    return quiz;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = { createQuiz, getQuiz, updateQuiz, deleteQuiz, publishQuiz };

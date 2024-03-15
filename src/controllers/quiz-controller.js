@@ -102,4 +102,25 @@ async function deleteQuiz(req, res) {
   }
 }
 
-module.exports = { createQuiz, getQuiz, updateQuiz, deleteQuiz };
+async function publishQuiz(req, res) {
+  try {
+    const quiz = await quizService.publishQuiz(req.body);
+
+    return res.json({
+      success: true,
+      message: "Successfully published quiz",
+      data: quiz,
+      error: {},
+    });
+  } catch (error) {
+    console.log("Only Owner can publish a Quiz");
+    return res.json({
+      success: false,
+      message: "Unsuccesful while publishing quiz",
+      data: {},
+      error: error,
+    });
+  }
+}
+
+module.exports = { createQuiz, getQuiz, updateQuiz, deleteQuiz, publishQuiz };
