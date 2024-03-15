@@ -4,7 +4,7 @@ class CrudRepository {
   }
 
   async create(data) {
-    console.log(data);
+    console.log("IN CRUD REPO");
 
     try {
       const response = await this.model.create(data);

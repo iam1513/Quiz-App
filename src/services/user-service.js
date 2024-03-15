@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const UserRepository = new userRepository();
 const jwt = require("jsonwebtoken");
 async function signUp(data) {
-
   const email = data.email;
 
   const emailExists = await UserRepository.findByEmail({ email: email });
@@ -88,4 +87,15 @@ async function signIn(data) {
   }
 }
 
-module.exports = { signUp, signIn };
+async function getUser(id) {
+  try {
+    const user = await UserRepository.get(id);
+    console.log(user);
+    return user;
+  } catch (error) {
+    console.log("+=====================================");
+    throw error;
+  }
+}
+
+module.exports = { signUp, signIn, getUser };
