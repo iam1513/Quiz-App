@@ -28,7 +28,7 @@ const authenticate = (req, res, next) => {
 
   // Pass userId to the next middleware or route handler
   req.userId = userId;
-  console.log(userId);
+  // console.log(userId);
 
   next();
 };

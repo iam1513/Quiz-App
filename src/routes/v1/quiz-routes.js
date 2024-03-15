@@ -5,5 +5,6 @@ const { authenticate } = require("../../middlewares/authenticate-middleware");
 const { quizController } = require("../../controllers");
 
 router.post("/", authenticate, quizController.createQuiz);
+router.get("/:id", authenticate, quizController.getQuiz);
 
 module.exports = router;
