@@ -30,8 +30,6 @@ async function createQuiz(req, res) {
 async function getQuiz(req, res) {
   try {
     const quiz = await quizService.getQuiz(req.params.id);
-
-    // To get only the fields we wanted
     const filteredQuiz = {
       name: quiz.name,
       questions_list: quiz.questions_list,
@@ -41,7 +39,7 @@ async function getQuiz(req, res) {
     return res.json({
       success: true,
       message: "Successfully got a quiz",
-      data: quiz,
+      data: filteredQuiz,
       error: {},
     });
   } catch (error) {
@@ -105,13 +103,23 @@ async function deleteQuiz(req, res) {
 async function publishQuiz(req, res) {
   try {
     const quiz = await quizService.publishQuiz(req.body);
-
-    return res.json({
-      success: true,
-      message: "Successfully published quiz",
-      data: quiz,
-      error: {},
-    });
+    const requestor = req.userId;
+    const creator = quiz.created_by.toString();
+    if (creator === requestor) {
+      return res.json({
+        success: true,
+        message: "Successfully published quiz",
+        data: quiz,
+        error: {},
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: "Unsuccesful while publishing quiz",
+        data: {},
+        error: error,
+      });
+    }
   } catch (error) {
     console.log("Only Owner can publish a Quiz");
     return res.json({

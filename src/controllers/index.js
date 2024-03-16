@@ -1,4 +1,5 @@
 module.exports = {
   userController: require("./user-controller"),
-  quizController : require("./quiz-controller"),
+  quizController: require("./quiz-controller"),
+  examController: require("./exam-controller"),
 };

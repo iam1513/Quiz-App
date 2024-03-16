@@ -64,7 +64,7 @@ async function signIn(data) {
 
     if (status) {
       const token = generateJWT(user);
-      console.log(token);
+      // console.log(token);
       return {
         status,
         user,
