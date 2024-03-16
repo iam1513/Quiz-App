@@ -2,15 +2,20 @@ const { userRepository } = require("../repositories");
 const bcrypt = require("bcryptjs");
 const UserRepository = new userRepository();
 const jwt = require("jsonwebtoken");
+const AppError = require("../utils/errors/app-error");
+const { StatusCodes } = require("http-status-codes");
+
 async function signUp(data) {
   const email = data.email;
 
   const emailExists = await UserRepository.findByEmail({ email: email });
 
   if (emailExists) {
-    throw {
-      message: "User already exits",
-    };
+    // Proper status code
+    throw new AppError(
+      "Email already Exists",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
   const password = data.password;
   const encryptedPassword = await bcrypt.hash(password, 9);
@@ -23,7 +28,10 @@ async function signUp(data) {
     await result.save();
     return result;
   } catch (error) {
-    throw error;
+    throw new AppError(
+      "Cannot fetch data of the user",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 }
 
@@ -38,11 +46,6 @@ async function signIn(data) {
     const email = data.email;
     const currentPassword = data.password;
     const user = await UserRepository.findByEmail({ email: email });
-    if (!user) {
-      throw {
-        message: "No user found with this Email",
-      };
-    }
 
     const status = await bcrypt.compare(currentPassword, user.password);
 
@@ -64,7 +67,6 @@ async function signIn(data) {
 
     if (status) {
       const token = generateJWT(user);
-      // console.log(token);
       return {
         status,
         user,
@@ -78,23 +80,31 @@ async function signIn(data) {
       };
     }
   } catch (error) {
-    return {
-      success: false,
-      message: "Wrong Password",
-      data: {},
-      error: error,
-    };
+    if (error.statusCode == StatusCodes.NOT_FOUND) {
+      throw new AppError(
+        "The User you requested is not present",
+        StatusCodes.NOT_FOUND
+      );
+    }
+    throw new AppError("Wrong Password", StatusCodes.UNAUTHORIZED);
   }
 }
 
 async function getUser(id) {
   try {
     const user = await UserRepository.get(id);
-    console.log(user);
     return user;
   } catch (error) {
-    console.log("+=====================================");
-    throw error;
+    if (error.statusCode == StatusCodes.NOT_FOUND) {
+      throw new AppError(
+        "The User you requested is not present",
+        StatusCodes.NOT_FOUND
+      );
+    }
+    throw new AppError(
+      "Cannot fetch data of the user",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 }
 

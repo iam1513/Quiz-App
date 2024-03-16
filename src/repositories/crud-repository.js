@@ -1,3 +1,6 @@
+const AppError = require("../utils/errors/app-error");
+const { StatusCodes } = require("http-status-codes");
+
 class CrudRepository {
   constructor(model) {
     this.model = model;
@@ -5,24 +8,19 @@ class CrudRepository {
 
   async create(data) {
     console.log("IN CRUD REPO");
-
-    try {
-      const response = await this.model.create(data);
-      return response;
-    } catch (error) {
-      console.log("Something went wrong in Crud repo");
-      throw error;
-    }
+    const response = await this.model.create(data);
+    return response;
   }
 
   async get(id) {
-    try {
-      const response = await this.model.findById(id);
-      return response;
-    } catch (error) {
-      console.log("Something went wrong in Crud repo");
-      throw error;
+    const response = await this.model.findById(id);
+    if (!response) {
+      throw new AppError(
+        "Not able to find the resource",
+        StatusCodes.NOT_FOUND
+      );
     }
+    return response;
   }
 
   // async find(data) {
@@ -36,23 +34,26 @@ class CrudRepository {
   // }
 
   async destroy(id) {
-    try {
-      const result = await this.model.findByIdAndDelete(id);
-      return result;
-    } catch (error) {
-      console.log("Something went wrong in Crud repo");
-      throw error;
+    const result = await this.model.findByIdAndDelete(id);
+    if (!result) {
+      throw new AppError(
+        "Not able to find the resource",
+        StatusCodes.NOT_FOUND
+      );
     }
+    return result;
   }
+  catch(error) {}
 
   async update(id, data) {
-    try {
-      const result = await this.model.findByIdAndUpdate(id, data);
-      return result;
-    } catch (error) {
-      console.log("Something went wrong in Crud repo");
-      throw error;
+    const result = await this.model.findByIdAndUpdate(id, data);
+    if (!result) {
+      throw new AppError(
+        "Not able to find the resource",
+        StatusCodes.NOT_FOUND
+      );
     }
+    return result;
   }
 }
 

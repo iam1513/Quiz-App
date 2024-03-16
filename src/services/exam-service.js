@@ -1,25 +1,31 @@
 const { quizRepository, resultRepository } = require("../repositories");
 const QuizRepository = new quizRepository();
 const ResultRepository = new resultRepository();
+const AppError = require("../utils/errors/app-error");
+const { StatusCodes } = require("http-status-codes");
 
 async function attemptQuiz(id) {
   try {
     const quiz = await QuizRepository.get(id);
-    console.log("QUIZ : ", quiz);
-    if (!quiz) {
-      console.log("No quiz with the id found.");
-      throw new Error("No quiz with the id found.");
-    }
 
     if (!quiz.is_published) {
-      console.log("Quiz not published.");
-      throw new Error("No quiz with the id found.");
+      throw new AppError(
+        "The Quiz you requested is not published",
+        StatusCodes.NOT_FOUND
+      );
     }
-
     return quiz;
   } catch (error) {
-    console.log("IN EXAM SERVICE");
-    throw error;
+    if (error.statusCode == StatusCodes.NOT_FOUND) {
+      throw new AppError(
+        "The Quiz you requested is not present",
+        StatusCodes.NOT_FOUND
+      );
+    }
+    throw new AppError(
+      "Cannot fetch data of all the Quiz",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 }
 
@@ -53,12 +59,12 @@ async function submitQuiz(data, userId) {
 
     const Result = await result.save();
 
-    console.log(Result);
-
     return result;
   } catch (error) {
-    console.log("Error in SUBMIT QUIZ SERVICES");
-    throw new Error("Error in SUBMIT QUIZ SERVICES");
+    throw new AppError(
+      "Not able to submit the quiz",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 }
 
