@@ -1,5 +1,6 @@
 const { quizService } = require("../services");
-
+const { StatusCodes } = require("http-status-codes");
+const { SuccessResponse, ErrorResponse } = require("../utils/common");
 async function createQuiz(req, res) {
   try {
     // console.log(req.userId);
@@ -11,19 +12,11 @@ async function createQuiz(req, res) {
       is_published: req.body.data.is_published,
     });
 
-    return res.json({
-      success: true,
-      message: "Successfully created a quiz",
-      data: quiz,
-      error: {},
-    });
+    SuccessResponse.data = quiz;
+    return res.status(StatusCodes.CREATED).json(SuccessResponse);
   } catch (error) {
-    return res.json({
-      success: false,
-      message: "Unsuccesful while creating a quiz",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
@@ -36,19 +29,11 @@ async function getQuiz(req, res) {
       answers: quiz.answers,
     };
 
-    return res.json({
-      success: true,
-      message: "Successfully got a quiz",
-      data: filteredQuiz,
-      error: {},
-    });
+    SuccessResponse.data = filteredQuiz;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
   } catch (error) {
-    return res.json({
-      success: false,
-      message: "Unsuccesful while getting a quiz",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
@@ -58,21 +43,12 @@ async function updateQuiz(req, res) {
     const requestor = req.userId;
     const creator = quiz.created_by.toString();
     if (creator === requestor) {
-      return res.json({
-        success: true,
-        message: "Successfully updated  quiz",
-        data: quiz,
-        error: {},
-      });
+      SuccessResponse.data = quiz;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
     }
   } catch (error) {
-    console.log("Only Owner can update the Quiz.");
-    return res.json({
-      success: false,
-      message: "Unsuccesful while updating quiz",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
@@ -82,21 +58,12 @@ async function deleteQuiz(req, res) {
     const requestor = req.userId;
     const creator = quiz.created_by.toString();
     if (creator === requestor) {
-      return res.json({
-        success: true,
-        message: "Successfully deleted  quiz",
-        data: null,
-        error: {},
-      });
+      SuccessResponse.data = quiz;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
     }
   } catch (error) {
-    console.log("Only Owner can delete a Quiz");
-    return res.json({
-      success: false,
-      message: "Unsuccesful while deleting quiz",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
@@ -106,28 +73,15 @@ async function publishQuiz(req, res) {
     const requestor = req.userId;
     const creator = quiz.created_by.toString();
     if (creator === requestor) {
-      return res.json({
-        success: true,
-        message: "Successfully published quiz",
-        data: quiz,
-        error: {},
-      });
+      SuccessResponse.data = quiz;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
     } else {
-      return res.json({
-        success: false,
-        message: "Unsuccesful while publishing quiz",
-        data: {},
-        error: error,
-      });
+      ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
     }
   } catch (error) {
-    console.log("Only Owner can publish a Quiz");
-    return res.json({
-      success: false,
-      message: "Unsuccesful while publishing quiz",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 

@@ -1,5 +1,6 @@
 const { userService } = require("../services");
-
+const { StatusCodes } = require("http-status-codes");
+const { SuccessResponse, ErrorResponse } = require("../utils/common");
 async function createUser(req, res) {
   try {
     const createdUser = await userService.signUp({
@@ -8,40 +9,22 @@ async function createUser(req, res) {
       name: req.body.name,
     });
 
-    return res.status(200).json({
-      success: true,
-      message: "Request Successfully completed",
-      data: createdUser,
-      error: {},
-    });
+    SuccessResponse.data = createdUser;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
   } catch (error) {
-    console.log("Something went wrong in user controller");
-    return res.status(500).json({
-      success: false,
-      message: "Request completion unsuccessful",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
 async function getUser(req, res) {
   try {
     const user = await userService.getUser(req.params.id);
-    return res.status(200).json({
-      success: true,
-      message: "Request Successfully completed",
-      data: user,
-      error: {},
-    });
+    SuccessResponse.data = user;
+    return res.status(StatusCodes.OK).json(SuccessResponse);
   } catch (error) {
-    console.log("Something went wrong in user controller");
-    return res.status(500).json({
-      success: false,
-      message: "Request completion unsuccessful",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
@@ -67,15 +50,8 @@ async function signIn(req, res) {
       });
     }
   } catch (error) {
-    console.log(
-      "==============================================================================="
-    );
-    return res.json({
-      success: false,
-      message: "Internal server error",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 

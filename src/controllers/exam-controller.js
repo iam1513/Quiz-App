@@ -1,28 +1,21 @@
 const { examService } = require("../services");
-
+const { StatusCodes } = require("http-status-codes");
+const { SuccessResponse, ErrorResponse } = require("../utils/common");
 async function attemptQuiz(req, res) {
   try {
     const quiz = await examService.attemptQuiz(req.params.id);
-    console.log("QUIZ CONT : ", quiz);
     const filteredQuiz = {
       name: quiz.name,
       questions_list: quiz.questions_list,
       is_published: quiz.is_published,
     };
 
-    return res.json({
-      success: true,
-      message: "Successfully got a quiz",
-      data: filteredQuiz,
-      error: {},
-    });
+    SuccessResponse.data = filteredQuiz;
+    // HANDLE STATUS
+    return res.status(StatusCodes.CREATED).json(SuccessResponse);
   } catch (error) {
-    return res.json({
-      success: false,
-      message: "Unsuccesful while getting a quiz",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
@@ -35,19 +28,11 @@ async function submitQuiz(req, res) {
       result_id: result._id,
     };
 
-    return res.json({
-      success: true,
-      message: "Successfully Submitted the quiz",
-      data: filteredResult,
-      error: {},
-    });
+    SuccessResponse.data = filteredResult;
+    return res.status(StatusCodes.CREATED).json(SuccessResponse);
   } catch (error) {
-    return res.json({
-      success: false,
-      message: "Unsuccesful while getting a quiz",
-      data: {},
-      error: error,
-    });
+    ErrorResponse.error = error;
+    return res.status(error.statusCode).json(ErrorResponse);
   }
 }
 
